@@ -6,4 +6,6 @@ import ryan.d.photogallery.GalleryItem
 class PhotoResponse {
     @SerializedName("photo") // indicates that we want the "photo" data from JSON
     lateinit var galleryItems: List<GalleryItem>
+
+    // update this for going through pages if you want
 }
