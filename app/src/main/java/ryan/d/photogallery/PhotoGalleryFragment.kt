@@ -1,5 +1,6 @@
 package ryan.d.photogallery
 
+import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.*
+import android.widget.Gallery
 import android.widget.ImageView
 import androidx.appcompat.widget.SearchView
 import android.widget.TextView
@@ -23,7 +25,7 @@ import java.util.concurrent.TimeUnit
 private const val TAG = "PhotoGalleryFragment"
 private const val POLL_WORK = "POLL_WORK"
 
-class PhotoGalleryFragment : Fragment() {
+class PhotoGalleryFragment : VisibleFragment() {
 
     private lateinit var photoRecyclerView: RecyclerView
     private lateinit var photoGalleryViewModel: PhotoGalleryViewModel
@@ -148,9 +150,24 @@ class PhotoGalleryFragment : Fragment() {
 
     }
 
-    private class PhotoHolder(private val itemImageView: ImageView):
-        RecyclerView.ViewHolder(itemImageView){
+    private inner class PhotoHolder(private val itemImageView: ImageView):
+        RecyclerView.ViewHolder(itemImageView), View.OnClickListener {
+
+        private lateinit var galleryItem: GalleryItem
+        init {
+            itemView.setOnClickListener(this)
+        }
+
         val bindDrawable: (Drawable) -> Unit = itemImageView::setImageDrawable
+
+        fun bindGalleryItem(item: GalleryItem){
+            galleryItem = item
+        }
+
+        override fun onClick(view: View){
+            val intent = Intent(Intent.ACTION_VIEW, galleryItem.photoPageUri)
+            startActivity(intent)
+        }
     }
 
     private inner class PhotoAdapter(private val galleryItems: List<GalleryItem>):
@@ -167,6 +184,7 @@ class PhotoGalleryFragment : Fragment() {
 
         override fun onBindViewHolder(holder: PhotoHolder, position: Int) {
             val galleryItem = galleryItems[position]
+            holder.bindGalleryItem(galleryItem)
             val placeholder: Drawable = ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.bill_up_close
